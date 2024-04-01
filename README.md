@@ -14,7 +14,7 @@ import (
 	"github.com/eljamo/weightedoption"
 )
 
-// Simulates 100 chances for dropping a raid exotic weapon from a Destiny which has a 5% drop chance when a player completes the raid
+// Simulates 30 chances for dropping a raid exotic weapon from a Destiny which has a 5% drop chance when a player completes the raid
 func main() {
 	s, err := weightedoption.NewSelector(
 		weightedoption.NewOption('🔫', 5),
