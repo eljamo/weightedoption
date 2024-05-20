@@ -1,5 +1,14 @@
 name: coverage
-on: push
+
+on:
+  push:
+    branches: [main, develop]
+    tags-ignore:
+      - "*"
+  pull_request:
+    branches:
+      - "*"
+  workflow_call:
 
 jobs:
   coverage:
