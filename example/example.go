@@ -11,8 +11,8 @@ import (
 func main() {
 	// Create a new selector with options and their weights
 	s, err := weightedoption.NewSelector(
-		weightedoption.NewOption('🔫', 5),  // 1% chance for the exotic weapon
-		weightedoption.NewOption('❌', 95), // 99% chance for no drop
+		weightedoption.NewOption('🔫', 5),  // 5% chance for the exotic weapon
+		weightedoption.NewOption('❌', 95), // 95% chance for no drop
 	)
 	if err != nil {
 		log.Fatal(err)
