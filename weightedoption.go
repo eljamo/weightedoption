@@ -59,11 +59,11 @@ func NewSelector[DataType any, WeightIntegerType WeightIntegerConstraint](
 
 	for i, opt := range filteredOptions {
 		weight := uint(opt.Weight)
-		if weight >= math.MaxInt {
+		if weight > math.MaxInt {
 			return nil, ErrWeightOverflow
 		}
 
-		if (math.MaxInt - totalWeight) <= weight {
+		if (math.MaxInt - totalWeight) < weight {
 			return nil, ErrWeightOverflow
 		}
 

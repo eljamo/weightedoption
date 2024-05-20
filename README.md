@@ -1,6 +1,6 @@
 # weightedoption
 
-A Go package for weighted random option selection 
+A Go package for weighted random option selection
 
 ## Example Usage
 
@@ -14,7 +14,7 @@ import (
 	"github.com/eljamo/weightedoption"
 )
 
-// Simulates 30 chances for dropping a raid exotic weapon from a Destiny which has a 5% drop chance when a player completes the raid
+// Simulates 100 chances for dropping a raid exotic weapon from a Destiny which has a 5% drop chance when a player completes the raid
 func main() {
 	s, err := weightedoption.NewSelector(
 		weightedoption.NewOption('🔫', 5),
@@ -24,7 +24,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	chances := make([]rune, 30)
+	chances := make([]rune, 100)
 	for i := 0; i < len(chances); i++ {
 		chances[i] = s.Select()
 	}
