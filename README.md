@@ -52,7 +52,7 @@ go run ./example/example.go
 
 ## Contributing
 
-If you'd like to contribute, please fork the repository and work your magic. Open a pull request to the `main` branch if it is a `bugfix` or `feature` branch. If a `hotfix`, open a pull request to the respective `release` branch.
+If you'd like to contribute, please fork the repository and work your magic. Open a pull request to the `main` branch if it is a `bugfix` or `feature` branch. If it is a `hotfix` branch, open a pull request to the respective `release` branch.
 
 ### Run the tests
 
