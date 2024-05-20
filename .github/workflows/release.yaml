@@ -15,9 +15,6 @@ jobs:
   test:
     uses: ./.github/workflows/test.yaml
     secrets: inherit
-  coverage:
-    uses: ./.github/workflows/coverage.yaml
-    secrets: inherit
   goreleaser:
     runs-on: ubuntu-latest
     steps:
