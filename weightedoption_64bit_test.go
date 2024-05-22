@@ -48,6 +48,7 @@ func TestNewSelector64Bit(t *testing.T) {
 
 	for _, tt := range u64tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			_, err := NewSelector(tt.cs...)
 			if err != tt.wantErr {
 				t.Errorf("NewSelector() error = %v, wantErr %v", err, tt.wantErr)
