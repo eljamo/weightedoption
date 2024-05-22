@@ -9,9 +9,6 @@ permissions:
   contents: write
 
 jobs:
-  codeql:
-    uses: ./.github/workflows/codeql-analysis.yaml
-    secrets: inherit
   lint:
     uses: ./.github/workflows/golangci-lint.yaml
     secrets: inherit
