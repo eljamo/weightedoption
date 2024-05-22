@@ -53,6 +53,7 @@ func TestNewSelector(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			_, err := NewSelector(tt.cs...)
 			if err != tt.wantErr {
 				t.Errorf("NewSelector() error = %v, wantErr %v", err, tt.wantErr)
@@ -102,8 +103,10 @@ func verifyFrequencyCounts(t *testing.T, counts map[int]int, options []Option[in
 	}
 }
 
-const BMMinOptions int = 10
-const BMMaxOptions int = 10_000_000
+const (
+	BMMinOptions int = 10
+	BMMaxOptions int = 10_000_000
+)
 
 func BenchmarkNewSelector(b *testing.B) {
 	for n := BMMinOptions; n <= BMMaxOptions; n *= 10 {

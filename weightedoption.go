@@ -9,7 +9,9 @@ import (
 )
 
 var (
+	// ErrNoValidOptions is used and returned when no Options are found with a Weight >= 1.
 	ErrNoValidOptions = errors.New("no Options found with Weight >= 1")
+	// ErrWeightOverflow is used and returned when the sum of all Option weights exceeds the max integer value for this system's architecture.
 	ErrWeightOverflow = errors.New("Option weight exceeds max integer value for this system's architecture")
 )
 
