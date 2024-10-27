@@ -96,7 +96,7 @@ func selectIndexes(selectors []*weightedoption.Selector[int, int], columnLength,
 }
 
 // Simulates a player rolling for weapon perks in a game, the system doesn't need to know about the perk
-// themselves, just the indexes of the perks. The player may get a bonus roll(s) for columns three and four.
+// themselves, just the indexes of the perks.
 func main() {
 	// Generate selectors for the weapon perks
 	selectors, err := generateEquallyWeightedSelectors()
@@ -105,7 +105,7 @@ func main() {
 	}
 
 	player := Player{
-		// Simulate player's may get a bonus roll(s) for columns three and four
+		// Simulate that players may get a bonus roll(s) for columns three and four
 		RollModifierForColumnThree: rand.IntN(3),
 		RollModifierForColumnFour:  rand.IntN(3),
 	}
