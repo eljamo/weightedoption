@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/eljamo/weightedoption/v2"
+	"github.com/eljamo/weightedoption/v3"
 )
 
 // Simulates 100 chances for dropping a raid exotic weapon from Destiny, which has a 5% drop chance when a player completes the raid

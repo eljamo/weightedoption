@@ -19,7 +19,7 @@ func TestNewSelector32Bit(t *testing.T) {
 		{
 			name:    "weight overflow from single option exceeding system's math.MaxInt",
 			cs:      []Option[rune, uint32]{{Data: 'a', Weight: uint32(math.MaxInt32) + 1}},
-			wantErr: ErrWeightOverflow,
+			wantErr: ErrSingleWeightOverflow,
 		},
 		{
 			name:    "weight doesn't overflow if a single option is equal to the system's math.MaxInt",
@@ -33,7 +33,7 @@ func TestNewSelector32Bit(t *testing.T) {
 				{Data: 'b', Weight: uint32(math.MaxInt32)/3 + 1},
 				{Data: 'c', Weight: uint32(math.MaxInt32)/3 + 1},
 			},
-			wantErr: ErrWeightOverflow,
+			wantErr: ErrTotalWeightOverflow,
 		},
 		{
 			name: "weight doesn't overflow from three options close to but not exceeding the system's math.MaxInt",

@@ -38,7 +38,7 @@ func TestNewSelector(t *testing.T) {
 		{
 			name:    "weight overflow",
 			cs:      []Option[rune, int]{{Data: 'a', Weight: math.MaxInt/2 + 1}, {Data: 'b', Weight: math.MaxInt/2 + 1}},
-			wantErr: ErrWeightOverflow,
+			wantErr: ErrTotalWeightOverflow,
 		},
 		{
 			name:    "nominal case",

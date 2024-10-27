@@ -19,7 +19,7 @@ func TestNewSelector64Bit(t *testing.T) {
 		{
 			name:    "weight overflow from single option exceeding the system's math.MaxInt",
 			cs:      []Option[rune, uint64]{{Data: 'a', Weight: uint64(math.MaxInt64) + 1}},
-			wantErr: ErrWeightOverflow,
+			wantErr: ErrSingleWeightOverflow,
 		},
 		{
 			name:    "weight doesn't overflow if a single option is equal to the system's math.MaxInt",
@@ -33,7 +33,7 @@ func TestNewSelector64Bit(t *testing.T) {
 				{Data: 'b', Weight: uint64(math.MaxInt64)/3 + 1},
 				{Data: 'c', Weight: uint64(math.MaxInt64)/3 + 1},
 			},
-			wantErr: ErrWeightOverflow,
+			wantErr: ErrTotalWeightOverflow,
 		},
 		{
 			name: "weight doesn't overflow from three options close to but not exceeding the system's math.MaxInt",
