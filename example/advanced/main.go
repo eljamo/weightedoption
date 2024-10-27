@@ -105,7 +105,7 @@ func main() {
 	}
 
 	player := Player{
-		// Simulate that players may get a bonus roll(s) for columns three and four
+		// Simulate that players may get bonus roll(s) for columns three and four
 		RollModifierForColumnThree: rand.IntN(3),
 		RollModifierForColumnFour:  rand.IntN(3),
 	}
