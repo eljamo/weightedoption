@@ -110,8 +110,10 @@ func maxFractionalDigits[DataType any, WeightType WeightConstraint](options []Op
 	return maxDigits, nil
 }
 
+const decimalBase = 10
+
 func scaleFloat64ToInt[DataType any, WeightType WeightConstraint](maxPrecision int, options []Option[DataType, WeightType]) ([]Option[DataType, WeightType], error) {
-	scaleFactor := math.Pow(10, float64(maxPrecision))
+	scaleFactor := math.Pow(decimalBase, float64(maxPrecision))
 	for i, opt := range options {
 		switch weight := any(opt.Weight).(type) {
 		case float64:
