@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"math/rand/v2"
 
 	"github.com/eljamo/weightedoption/v3"
@@ -29,6 +28,7 @@ func (b *GachaBanner) pull(userId string) string {
 	pityCount := b.pityCounterMap[userId] + 1
 
 	if pityCount >= b.pityThreshold {
+		fmt.Println("Pity drop after reaching threshold")
 		// Reset the pity counter
 		b.pityCounterMap[userId] = 0
 		return b.pityDrop
@@ -52,35 +52,61 @@ func (b *GachaBanner) PullN(n int, userId string) []string {
 
 }
 
+func NewGachaBanner(pool []weightedoption.Option[string, float64], pityThreshold int, pityDrop string) (*GachaBanner, error) {
+	s, err := weightedoption.NewSelector(pool...)
+	if err != nil {
+		return nil, err
+	}
+
+	return &GachaBanner{
+		pool:           pool,
+		pityThreshold:  pityThreshold,
+		pityDrop:       pityDrop,
+		pityCounterMap: make(map[string]int),
+		selector:       s,
+	}, nil
+}
+
+func generateOptions(mainItem, secondaryItem, tertiaryItem string, remainingItems []string) []weightedoption.Option[string, float64] {
+	const totalWeight = 100.0
+	weights := map[string]float64{
+		"main":      0.6,
+		"secondary": 3.3,
+		"tertiary":  1.77,
+	}
+
+	remainingWeight := (totalWeight - weights["main"] - weights["secondary"] - weights["tertiary"]) / float64(len(remainingItems))
+
+	options := []weightedoption.Option[string, float64]{
+		{Data: mainItem, Weight: weights["main"]},
+		{Data: secondaryItem, Weight: weights["secondary"]},
+		{Data: tertiaryItem, Weight: weights["tertiary"]},
+	}
+
+	for _, item := range remainingItems {
+		options = append(options, weightedoption.Option[string, float64]{Data: item, Weight: remainingWeight})
+	}
+
+	return options
+}
+
 // Simulates a mobile game gacha pull which drops 10 items and they have floating point weights
 func main() {
 	userId := "123456"
 	pityThreshold := 90
 	pityDrop := "5★ Character"
-	pityCounterMap := make(map[string]int)
 
-	pool := []weightedoption.Option[string, float64]{
-		{Data: pityDrop, Weight: 0.6},
-		{Data: "4★ Character", Weight: 3.3},
-		{Data: "4★ Weapon (Sword)", Weight: 1.77},
-		{Data: "3★ Weapon (Sword)", Weight: 18.86},
-		{Data: "3★ Weapon (Polearm)", Weight: 18.86},
-		{Data: "3★ Weapon (Bow)", Weight: 18.86},
-		{Data: "3★ Weapon (Claymore)", Weight: 18.86},
-		{Data: "3★ Weapon (Staff)", Weight: 18.86},
-	}
+	pool := generateOptions("5★ Character", "4★ Character", "4★ Weapon (Sword)", []string{
+		"3★ Weapon (Sword)",
+		"3★ Weapon (Polearm)",
+		"3★ Weapon (Bow)",
+		"3★ Weapon (Claymore)",
+		"3★ Weapon (Staff)",
+	})
 
-	s, err := weightedoption.NewSelector(pool...)
+	banner, err := NewGachaBanner(pool, pityThreshold, pityDrop)
 	if err != nil {
-		log.Fatal(err)
-	}
-
-	banner := GachaBanner{
-		pool:           pool,
-		pityThreshold:  pityThreshold,
-		pityDrop:       pityDrop,
-		pityCounterMap: pityCounterMap,
-		selector:       s,
+		panic(err)
 	}
 
 	count := 0
@@ -99,7 +125,6 @@ func main() {
 			count++
 
 			if drop == pityDrop {
-				count = 0
 				pityPulled = true
 			}
 		}
