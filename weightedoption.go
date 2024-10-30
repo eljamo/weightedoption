@@ -25,18 +25,14 @@ type WeightConstraint interface {
 }
 
 // Option is a struct that holds a data value and its associated weight.
-// If using floating point weights, the weights will be multiplied by 100 to convert them to integers.
-// So 0.5 will become 50, 0.75 will become 75, etc. It's only precise to 2 decimal places. If you need
-// more precision you should convert the weights to integers yourself.
+// The Weight is used to determine the probability of the data being selected.
 type Option[DataType any, WeightType WeightConstraint] struct {
 	Data   DataType
 	Weight WeightType
 }
 
 // NewOption creates a new Option with the provided data and weight.
-// If using floating point weights, the weights will be multiplied by 100 to convert them to integers.
-// So 0.5 will become 50, 0.75 will become 75, etc. It's only precise to 2 decimal places. If you need
-// more precision you should convert the weights to integers yourself.
+// The Weight is used to determine the probability of the data being selected.
 func NewOption[DataType any, WeightType WeightConstraint](
 	data DataType,
 	weight WeightType,
@@ -96,7 +92,7 @@ func maxFractionalDigits[DataType any, WeightType WeightConstraint](options []Op
 		case float64:
 			_, err := processWeight(weight)
 			if err != nil {
-				return 0, fmt.Errorf("invalid float64 weight for option: option=%v", opt.Data)
+				return 0, fmt.Errorf("invalid float64 weight for option: option=%v, error=%v", opt.Data, err)
 			}
 		default:
 			return 0, fmt.Errorf("weight failed type assertion, not a valid float64: option=%v, weight=%v", opt.Data, opt.Weight)
@@ -112,6 +108,7 @@ func maxFractionalDigits[DataType any, WeightType WeightConstraint](options []Op
 
 const decimalBase = 10
 
+// scaleFloat64ToInt scales float64 weights to integers based on the maximum number of fractional digits.
 func scaleFloat64ToInt[DataType any, WeightType WeightConstraint](maxPrecision int, options []Option[DataType, WeightType]) ([]Option[DataType, WeightType], error) {
 	scaleFactor := math.Pow(decimalBase, float64(maxPrecision))
 	for i, opt := range options {
@@ -138,6 +135,7 @@ func prepareOptions[DataType any, WeightType WeightConstraint](
 		}
 	}
 
+	// Return an error if no valid options are found
 	if len(filteredOptions) == 0 {
 		return nil, ErrNoValidOptions
 	}
@@ -161,7 +159,11 @@ func prepareOptions[DataType any, WeightType WeightConstraint](
 	return scaleFloat64ToInt(maxDigits, filteredOptions)
 }
 
-// NewSelector creates a new Selector for selecting provided Options.
+// NewSelector creates a new Selector for selecting provided Options. The Weights
+// provided must be a positive integer or float64. If the weight is a float64,
+// it will be scaled to an integer. If the weight is less than or equal to 0,
+// the option will be ignored. If all options have a weight of 0 or lower,
+// an error will be returned. If math.Inf(1) is used an error will be returned.
 func NewSelector[DataType any, WeightType WeightConstraint](
 	opts ...Option[DataType, WeightType],
 ) (*Selector[DataType, WeightType], error) {
