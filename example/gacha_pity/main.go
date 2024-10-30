@@ -16,16 +16,11 @@ func oneOrTen() int {
 }
 
 type GachaBanner struct {
-	// The pool of items that can be dropped
-	pool []weightedoption.Option[string, float64]
-	// The pity threshold for the banner
-	pityThreshold int
-	// The item that will be dropped when the pity threshold is reached
-	pityDrop string
-	// The pity counter for the banner
+	pool           []weightedoption.Option[string, float64]
+	pityThreshold  int
+	pityDrop       string
 	pityCounterMap map[string]int
-	// selector
-	selector *weightedoption.Selector[string, float64]
+	selector       *weightedoption.Selector[string, float64]
 }
 
 func (b *GachaBanner) pull(userId string) string {
@@ -75,7 +70,6 @@ func main() {
 		{Data: "3★ Weapon (Staff)", Weight: 18.86},
 	}
 
-	// Create a new selector with options and their weights
 	s, err := weightedoption.NewSelector(pool...)
 	if err != nil {
 		log.Fatal(err)
@@ -119,7 +113,6 @@ func main() {
 		tally[drop]++
 	}
 
-	// Print the tally for each item
 	fmt.Println("Tally:")
 	for item, count := range tally {
 		fmt.Printf("%s: %d\n", item, count)
