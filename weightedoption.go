@@ -27,8 +27,8 @@ type WeightConstraint interface {
 // Option is a struct that holds a data value and its associated weight.
 // The Weight is used to determine the probability of the data being selected.
 type Option[DataType any, WeightType WeightConstraint] struct {
-	Data   DataType
 	Weight WeightType
+	Data   DataType
 }
 
 // NewOption creates a new Option with the provided data and weight.
@@ -42,9 +42,9 @@ func NewOption[DataType any, WeightType WeightConstraint](
 
 // Selector is a struct that holds a slice of Options, their running total weights, and the total weight.
 type Selector[DataType any, WeightType WeightConstraint] struct {
-	options              []DataType
-	cumulativeWeightSums []uint
 	totalWeight          uint
+	cumulativeWeightSums []uint
+	options              []DataType
 }
 
 func isFloat64[WeightType WeightConstraint](val WeightType) bool {

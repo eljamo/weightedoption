@@ -49,7 +49,6 @@ func (b *GachaBanner) PullN(n int, userId string) []string {
 	}
 
 	return drops
-
 }
 
 func NewGachaBanner(pool []weightedoption.Option[string, float64], pityThreshold int, pityDrop string) (*GachaBanner, error) {

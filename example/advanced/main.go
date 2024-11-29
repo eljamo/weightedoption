@@ -95,7 +95,7 @@ func selectIndexes(selectors []*weightedoption.Selector[int, int], columnLength,
 	return perks, nil
 }
 
-// Simulates a player rolling for weapon perks in a game, the system doesn't need to know about the perk
+// Simulates a player rolling for perks in a game, the system doesn't need to know about the perk
 // themselves, just the indexes of the perks.
 func main() {
 	// Generate selectors for the weapon perks
