@@ -89,7 +89,7 @@ func generateOptions(mainItem, secondaryItem, tertiaryItem string, remainingItem
 	return options
 }
 
-// Simulates a mobile game gacha pull which drops 10 items and they have floating point weights
+// Simulates a mobile game gacha drop system with a pity system
 func main() {
 	userId := "123456"
 	pityThreshold := 90
@@ -113,7 +113,7 @@ func main() {
 	allDrops := make([]string, 0)
 	tally := make(map[string]int)
 
-	// Run until the pity drop is pulled, om the 90th it'll be guaranteed
+	// Run until the pity drop is pulled, on the 90th it'll be guaranteed
 	for !pityPulled {
 		timesToPull := oneOrTen()
 		drops := banner.PullN(timesToPull, userId)

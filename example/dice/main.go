@@ -1,30 +1,39 @@
 package main
 
-import "github.com/eljamo/weightedoption/v3"
+import (
+	"fmt"
+
+	"github.com/eljamo/weightedoption/v3"
+)
 
 func getOptions(sides int) []weightedoption.Option[int, int] {
 	options := make([]weightedoption.Option[int, int], sides)
 	for i := 0; i < sides; i++ {
-		options[i] = weightedoption.NewOption(i, 1)
+		options[i] = weightedoption.NewOption(i+1, 1)
 	}
 
 	return options
 }
 
-func main() {
-	sides := 20
-
-	// Create a new selector with 20 options, each with a weight of 1
+func rollDice(sides int) (int, error) {
 	selector, err := weightedoption.NewSelector(
 		getOptions(sides)...,
 	)
 	if err != nil {
-		panic(err)
+		return 0, err
 	}
 
-	// Select a random option
-	selected := selector.Select()
+	return selector.Select(), nil
+}
 
-	// Print the selected option
-	println(selected)
+func main() {
+	diceSides := []int{4, 6, 8, 10, 12, 20}
+
+	for _, sides := range diceSides {
+		result, err := rollDice(sides)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Printf("Rolled a d%d: %d\n", sides, result)
+	}
 }

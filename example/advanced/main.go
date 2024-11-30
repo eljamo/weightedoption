@@ -8,13 +8,13 @@ import (
 )
 
 type Player struct {
-	RollModifierForColumnThree int
-	RollModifierForColumnFour  int
+	RollBonusSocketThree int
+	RollBonusSocketFour  int
 }
 
-type Config struct {
-	Length        int
-	NumberOfRolls int
+type ItemSocketConfig struct {
+	SocketPlugCount int
+	Rolls           int
 }
 
 const (
@@ -51,25 +51,25 @@ func generateEquallyWeightedSelectors() ([]*weightedoption.Selector[int, int], e
 	return selectors, nil
 }
 
-func getIndexes(selectors []*weightedoption.Selector[int, int], selections []Config) ([][]int, error) {
-	perkIndexes := make([][]int, len(selections))
+func getIndexes(selectors []*weightedoption.Selector[int, int], selections []ItemSocketConfig) ([][]int, error) {
+	plugIndexes := make([][]int, len(selections))
 	for i, config := range selections {
-		if config.Length < MIN_OPTIONS {
-			return nil, fmt.Errorf("length value (%d) must be equal or greater than to %d", config.Length, MIN_OPTIONS)
+		if config.SocketPlugCount < MIN_OPTIONS {
+			return nil, fmt.Errorf("length value (%d) must be equal or greater than to %d", config.SocketPlugCount, MIN_OPTIONS)
 		}
 
-		if config.Length > MAX_OPTIONS {
-			return nil, fmt.Errorf("length value (%d) must be equal or less than %d", config.Length, MAX_OPTIONS)
+		if config.SocketPlugCount > MAX_OPTIONS {
+			return nil, fmt.Errorf("length value (%d) must be equal or less than %d", config.SocketPlugCount, MAX_OPTIONS)
 		}
 
-		perks, err := selectIndexes(selectors, config.Length, config.NumberOfRolls)
+		plugs, err := selectIndexes(selectors, config.SocketPlugCount, config.Rolls)
 		if err != nil {
 			return nil, err
 		}
-		perkIndexes[i] = perks
+		plugIndexes[i] = plugs
 	}
 
-	return perkIndexes, nil
+	return plugIndexes, nil
 }
 
 func selectIndexes(selectors []*weightedoption.Selector[int, int], columnLength, numRolls int) ([]int, error) {
@@ -79,24 +79,26 @@ func selectIndexes(selectors []*weightedoption.Selector[int, int], columnLength,
 
 	selectorIndex := columnLength - MIN_OPTIONS
 	selectedPerks := make(map[int]bool)
-	perks := make([]int, numRolls)
+	plugs := make([]int, numRolls)
 	for i := 0; i < numRolls; i++ {
-		var perk int
+		var plug int
 		for {
-			perk = selectors[selectorIndex].Select()
-			if !selectedPerks[perk] {
-				selectedPerks[perk] = true
+			plug = selectors[selectorIndex].Select()
+			if !selectedPerks[plug] {
+				selectedPerks[plug] = true
 				break
 			}
 		}
-		perks[i] = perk
+		plugs[i] = plug
 	}
 
-	return perks, nil
+	return plugs, nil
 }
 
-// Simulates a player rolling for perks in a game, the system doesn't need to know about the perk
-// themselves, just the indexes of the perks.
+// This is using Destiny 2's weapon perk system as an example. Items have sockets which have plugs.
+// Destiny 2's uses this system for it's weapons perks. Each weapon has a certain number of sockets
+// with each socket having at least one plug (perk) to choose from a pool of plugs. The number of
+// plugs in each socket can vary. The player may get bonus rolls for certain sockets.
 func main() {
 	// Generate selectors for the weapon perks
 	selectors, err := generateEquallyWeightedSelectors()
@@ -105,25 +107,25 @@ func main() {
 	}
 
 	player := Player{
-		// Simulate that players may get bonus rolls for columns three and four
-		RollModifierForColumnThree: rand.IntN(3),
-		RollModifierForColumnFour:  rand.IntN(3),
+		// Simulate that players may get bonus rolls for sockets three and four
+		RollBonusSocketThree: rand.IntN(3),
+		RollBonusSocketFour:  rand.IntN(3),
 	}
 
-	weapon := []Config{
-		{Length: 9, NumberOfRolls: 2},
-		{Length: 8, NumberOfRolls: 2},
-		{Length: 11, NumberOfRolls: 1 + player.RollModifierForColumnThree},
-		{Length: 12, NumberOfRolls: 1 + player.RollModifierForColumnFour},
+	weapon := []ItemSocketConfig{
+		{SocketPlugCount: 9, Rolls: 2},
+		{SocketPlugCount: 8, Rolls: 2},
+		{SocketPlugCount: 11, Rolls: 1 + player.RollBonusSocketThree},
+		{SocketPlugCount: 12, Rolls: 1 + player.RollBonusSocketFour},
 	}
 
-	weaponIndexes, err := getIndexes(selectors, weapon)
+	weaponSocketPlugIndexes, err := getIndexes(selectors, weapon)
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println("Weapon Perk Indexes:")
-	for i, column := range weaponIndexes {
-		fmt.Printf("Column %d: %v\n", i+1, column)
+	fmt.Println("Plug Indexes for Item Sockets:")
+	for i, column := range weaponSocketPlugIndexes {
+		fmt.Printf("Socket %d: %v\n", i+1, column)
 	}
 }
