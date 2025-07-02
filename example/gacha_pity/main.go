@@ -93,9 +93,9 @@ func generateOptions(mainItem, secondaryItem, tertiaryItem string, remainingItem
 func main() {
 	userId := "123456"
 	pityThreshold := 90
-	pityDrop := "5★ Character"
+	mainDrop := "5★ Character"
 
-	pool := generateOptions("5★ Character", "4★ Character", "4★ Weapon (Sword)", []string{
+	pool := generateOptions(mainDrop, "4★ Character", "4★ Weapon (Sword)", []string{
 		"3★ Weapon (Sword)",
 		"3★ Weapon (Polearm)",
 		"3★ Weapon (Bow)",
@@ -103,7 +103,7 @@ func main() {
 		"3★ Weapon (Staff)",
 	})
 
-	banner, err := NewGachaBanner(pool, pityThreshold, pityDrop)
+	banner, err := NewGachaBanner(pool, pityThreshold, mainDrop)
 	if err != nil {
 		panic(err)
 	}
@@ -113,7 +113,7 @@ func main() {
 	allDrops := make([]string, 0)
 	tally := make(map[string]int)
 
-	// Run until the pity drop is pulled, on the 90th it'll be guaranteed
+	// Run until the main drop is pulled, on the 90th it'll be guaranteed
 	for !pityPulled {
 		timesToPull := oneOrTen()
 		drops := banner.PullN(timesToPull, userId)
@@ -123,7 +123,7 @@ func main() {
 
 			count++
 
-			if drop == pityDrop {
+			if drop == mainDrop {
 				pityPulled = true
 			}
 		}
