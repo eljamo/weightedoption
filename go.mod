@@ -1,3 +1,3 @@
-module github.com/eljamo/weightedoption/v2
+module github.com/eljamo/weightedoption/v3
 
-go 1.22.1
+go 1.23.2
