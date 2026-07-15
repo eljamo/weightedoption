@@ -12,5 +12,8 @@ changelog:
   sort: asc
   filters:
     exclude:
-      - '^docs:'
-      - '^test:'
+      - "^docs[:(]"
+      - "^chore[:(]"
+      - "^test[:(]"
+      - "^build[:(]"
+      - "^ci[:(]"
