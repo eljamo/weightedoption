@@ -25,3 +25,9 @@ go.work
 
 # GoLand
 .idea/
+
+# AI Tooling
+.claude/
+.kilo/
+.agents/
+plans/

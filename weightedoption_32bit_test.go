@@ -1,5 +1,4 @@
 //go:build 386 || arm || mips || mipsle
-// +build 386 arm mips mipsle
 
 package weightedoption
 
@@ -54,5 +53,15 @@ func TestNewSelector32Bit(t *testing.T) {
 				t.Errorf("NewSelector() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
+	}
+}
+
+func TestNewSelectorFloat64Large32Bit(t *testing.T) {
+	t.Parallel()
+
+	// 1e15 exceeds a 32-bit int; the mirror case in
+	// weightedoption_64bit_test.go accepts it on 64-bit platforms.
+	if _, err := NewSelector(NewOption('a', 1e15)); err != ErrSingleWeightOverflow {
+		t.Errorf("NewSelector() error = %v, wantErr %v", err, ErrSingleWeightOverflow)
 	}
 }

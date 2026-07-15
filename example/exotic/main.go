@@ -19,7 +19,7 @@ func main() {
 	}
 
 	chances := make([]rune, 100) // Array to store the results of 100 attempts
-	for i := 0; i < len(chances); i++ {
+	for i := range chances {
 		chances[i] = s.Select() // Select an option based on their weights
 	}
 	fmt.Println(string(chances))

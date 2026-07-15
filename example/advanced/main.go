@@ -80,7 +80,7 @@ func selectIndexes(selectors []*weightedoption.Selector[int, int], columnLength,
 	selectorIndex := columnLength - MIN_OPTIONS
 	selectedPerks := make(map[int]bool)
 	plugs := make([]int, numRolls)
-	for i := 0; i < numRolls; i++ {
+	for i := range numRolls {
 		var plug int
 		for {
 			plug = selectors[selectorIndex].Select()

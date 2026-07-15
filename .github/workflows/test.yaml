@@ -22,6 +22,22 @@ jobs:
           go-version: ">=1.22"
       - name: Tests
         run: go test --race --shuffle=on ./...
+  test-386:
+    runs-on: ubuntu-latest
+    name: Test (linux/386)
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Setup
+        uses: actions/setup-go@v6
+        with:
+          go-version: ">=1.22"
+      - name: Tests
+        env:
+          GOARCH: "386"
+        run: go test --shuffle=on ./...
   coverage:
     runs-on: ubuntu-latest
     name: Test Coverage

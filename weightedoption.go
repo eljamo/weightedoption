@@ -7,6 +7,8 @@ import (
 	"math"
 	"math/rand/v2"
 	"slices"
+	"strconv"
+	"strings"
 )
 
 var (
@@ -17,6 +19,9 @@ var (
 
 	// Error for total weight exceeding system max integer value when summing.
 	ErrTotalWeightOverflow = errors.New("total weight exceeds max integer value for this system's architecture")
+
+	// Error for a weight so small it rounds to zero at the supported float64 precision.
+	ErrWeightPrecisionLoss = errors.New("Option weight rounds to zero at the supported float64 precision")
 )
 
 // WeightConstraint is a type constraint for the Weight field of the Option struct.
@@ -54,23 +59,17 @@ func isFloat64[WeightType WeightConstraint](val WeightType) bool {
 
 // countFractionalDigits counts the number of digits after the decimal point, returning an error for invalid floats.
 func countFractionalDigits(f float64) (int, error) {
-	// Handle invalid cases early
 	if math.IsNaN(f) || math.IsInf(f, 0) {
 		return 0, fmt.Errorf("invalid float: %v", f)
 	}
 
-	// If the number is already an integer, no fractional digits
-	if f == math.Trunc(f) {
+	// Shortest decimal representation that round-trips to f.
+	s := strconv.FormatFloat(f, 'f', -1, 64)
+	dot := strings.IndexByte(s, '.')
+	if dot < 0 {
 		return 0, nil
 	}
-
-	// Count the number of fractional digits by multiplying until the fractional part becomes zero
-	count := 0
-	for math.Trunc(f) != f {
-		f *= 10
-		count++
-	}
-	return count, nil
+	return min(len(s)-dot-1, maxSupportedFractionalDigits), nil
 }
 
 func processWeight(weight float64) (int, error) {
@@ -90,10 +89,11 @@ func maxFractionalDigits[DataType any, WeightType WeightConstraint](options []Op
 
 		switch weight := any(opt.Weight).(type) {
 		case float64:
-			_, err := processWeight(weight)
+			d, err := processWeight(weight)
 			if err != nil {
 				return 0, fmt.Errorf("invalid float64 weight for option: option=%v, error=%v", opt.Data, err)
 			}
+			digits = d
 		default:
 			return 0, fmt.Errorf("weight failed type assertion, not a valid float64: option=%v, weight=%v", opt.Data, opt.Weight)
 		}
@@ -106,7 +106,10 @@ func maxFractionalDigits[DataType any, WeightType WeightConstraint](options []Op
 	return maxDigits, nil
 }
 
-const decimalBase = 10
+const (
+	decimalBase                  = 10
+	maxSupportedFractionalDigits = 9
+)
 
 // scaleFloat64ToInt scales float64 weights to integers based on the maximum number of fractional digits.
 func scaleFloat64ToInt[DataType any, WeightType WeightConstraint](maxPrecision int, options []Option[DataType, WeightType]) ([]Option[DataType, WeightType], error) {
@@ -114,8 +117,14 @@ func scaleFloat64ToInt[DataType any, WeightType WeightConstraint](maxPrecision i
 	for i, opt := range options {
 		switch weight := any(opt.Weight).(type) {
 		case float64:
-			scaledWeight := int(math.Round(weight * scaleFactor))
-			options[i].Weight = WeightType(scaledWeight)
+			scaled := math.Round(weight * scaleFactor)
+			if scaled >= float64(math.MaxInt) {
+				return nil, ErrSingleWeightOverflow
+			}
+			if scaled < 1 {
+				return nil, ErrWeightPrecisionLoss
+			}
+			options[i].Weight = WeightType(int(scaled))
 		default:
 			return nil, fmt.Errorf("weight failed type assertion, not a valid float64: option=%v, weight=%v", opt.Data, opt.Weight)
 		}
@@ -141,7 +150,7 @@ func prepareOptions[DataType any, WeightType WeightConstraint](
 	}
 
 	// Sort options by weight in ascending order
-	slices.SortFunc(options, func(a, b Option[DataType, WeightType]) int {
+	slices.SortFunc(filteredOptions, func(a, b Option[DataType, WeightType]) int {
 		return cmp.Compare(a.Weight, b.Weight)
 	})
 
@@ -176,11 +185,14 @@ func NewSelector[DataType any, WeightType WeightConstraint](
 	cumulativeWeightSums := make([]uint, len(opts))
 	options := make([]DataType, len(opts))
 	for i, opt := range opts {
-		weight := uint(opt.Weight)
-		// Check for overflow
-		if weight > math.MaxInt {
+		w64 := uint64(opt.Weight)
+		// Check for overflow before narrowing to uint (uint is 32 bits on
+		// 32-bit platforms; float64 weights are integral and < 2^63 here,
+		// guaranteed by scaleFloat64ToInt).
+		if w64 > uint64(math.MaxInt) {
 			return nil, ErrSingleWeightOverflow
 		}
+		weight := uint(w64)
 
 		if (math.MaxInt - totalWeight) < weight {
 			return nil, ErrTotalWeightOverflow
@@ -206,5 +218,13 @@ func NewSelector[DataType any, WeightType WeightConstraint](
 func (s Selector[DataType, WeightType]) Select() DataType {
 	r := rand.UintN(s.totalWeight) + 1
 	i, _ := slices.BinarySearch(s.cumulativeWeightSums, r)
+	return s.options[i]
+}
+
+// SelectFrom returns a single DataType from Selector.Options using your own random number generator.
+// Useful when you need deterministic behavior or want to control the randomness.
+func (s Selector[DataType, WeightType]) SelectFrom(r *rand.Rand) DataType {
+	randomWeight := r.UintN(s.totalWeight) + 1
+	i, _ := slices.BinarySearch(s.cumulativeWeightSums, randomWeight)
 	return s.options[i]
 }

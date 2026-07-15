@@ -43,7 +43,7 @@ func (b *GachaBanner) pull(userId string) string {
 func (b *GachaBanner) PullN(n int, userId string) []string {
 	drops := make([]string, n)
 
-	for i := 0; i < n; i++ {
+	for i := range n {
 		drop := b.pull(userId)
 		drops[i] = drop
 	}

@@ -8,7 +8,7 @@ import (
 
 func getOptions(sides int) []weightedoption.Option[int, int] {
 	options := make([]weightedoption.Option[int, int], sides)
-	for i := 0; i < sides; i++ {
+	for i := range sides {
 		options[i] = weightedoption.NewOption(i+1, 1)
 	}
 

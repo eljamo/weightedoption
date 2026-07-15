@@ -27,7 +27,7 @@ func main() {
 
 	tally := make(map[string]int)
 	drops := make([]string, 10)
-	for i := 0; i < len(drops); i++ {
+	for i := range drops {
 		result := s.Select()
 		drops[i] = result
 		tally[result]++
